@@ -3,7 +3,6 @@ from collections import defaultdict
 from pandas import DataFrame
 
 
-# class NaiveBayesNormalDistribution:
 class NaiveBayesGaussian:
     """
     Naive Bayes Normal Distribution Classifire
