@@ -3,6 +3,7 @@ import numpy as np
 import naive_bayes as nb
 
 import pprint
+
 pp = pprint.PrettyPrinter(indent=4)
 
 
@@ -388,7 +389,7 @@ def run_spam_ham():
     spam_ham.print_result(cnt_good, cnt_bad)
 
 
-def run_multinomial():
+def run_categorical():
     # 'sports' == 1
     # 'suv' == 2
     train_data = [
@@ -437,8 +438,85 @@ def run_multinomial():
     return
 
 
+def run_iris():
+    iris = nb.NaiveBayesCategorical()
+
+    fraction_test = 0.1
+
+    df_iris_raw = pd.read_csv('input/Iris.csv', delimiter=',')
+    df_iris_raw = df_iris_raw.drop(['Id'], axis=1)
+
+    df_iris_raw['SepalLengthCm'] = df_iris_raw['SepalLengthCm'].fillna(0)
+    df_iris_raw['SepalWidthCm'] = df_iris_raw['SepalWidthCm'].fillna(0)
+    df_iris_raw['PetalLengthCm'] = df_iris_raw['PetalLengthCm'].fillna(0)
+    df_iris_raw['PetalWidthCm'] = df_iris_raw['PetalWidthCm'].fillna(0)
+
+    df_iris_raw.head(5)
+
+    df_iris_test = pd.concat([
+        df_iris_raw.loc[df_iris_raw['Species'] == 'Iris-setosa'].sample(frac=fraction_test, random_state=12345),
+        df_iris_raw.loc[df_iris_raw['Species'] == 'Iris-versicolor'].sample(frac=fraction_test, random_state=12345),
+        df_iris_raw.loc[df_iris_raw['Species'] == 'Iris-virginica'].sample(frac=fraction_test, random_state=12345),
+    ])
+
+    df_iris_train = df_iris_raw.drop(df_iris_test.index)
+
+    print(f'Данные для расчета: {len(df_iris_train)}')
+    print(f'Данные для проверки: {len(df_iris_test)}')
+
+    iris.train(df=df_iris_train, class_column='Species')
+    # print('Таблица правдоподобия')
+    # pp.pprint(iris.get_likelihood_table())
+    # print()
+
+    # df_iris_test.iterrows()
+    test_count = {'ok': 0, 'error': 0}
+    for index, row in df_iris_test.iterrows():
+
+        reference = row['Species']
+        data_check = {
+            'SepalLengthCm': row['SepalLengthCm'],
+            'SepalWidthCm': row['SepalWidthCm'],
+            'PetalLengthCm': row['PetalLengthCm'],
+            'PetalWidthCm': row['PetalWidthCm']
+        }
+        p = iris.probability(data_check=data_check)
+        print(f'{p["answer"].capitalize()}? {data_check}')
+
+        answer = {'title': '', 'p': 0}
+        for i in p['probability']:
+            if answer['title'] == '' or p['probability'][i] >= answer['p']:
+                answer['title'] = i
+                answer['p'] = p['probability'][i]
+        print('{0}: Эталон: {1}'.format(answer['title'], reference))
+        print()
+        if answer['title'] == reference:
+            test_count['ok'] += 1
+        else:
+            test_count['error'] += 1
+    print(test_count)
+
+    # # Iris-virginica
+    # data_check = {'SepalLengthCm': 5.9, 'SepalWidthCm': 3.0, 'PetalLengthCm': 5.1, 'PetalWidthCm': 1.8}
+    # p = iris.probability(data_check=data_check)
+    # print(f'{p["answer"].capitalize()}? {data_check}')
+    #
+    # answer = {'title': '', 'p': 0}
+    # for i in p['probability']:
+    #     if answer['title'] == '' or p['probability'][i] >= answer['p']:
+    #         answer['title'] = i
+    #         answer['p'] = p['probability'][i]
+    # print('{0}: {1}'.format(answer['title'], answer['p']))
+    #
+    # print()
+    # print('probability of `{0}` : {1}'.format(p["answer"], p['probability']))
+
+    return
+
+
 if __name__ == '__main__':
     # normal_distribution()
     # run_cats_dogs()
     # spam_ham()
-    run_multinomial()
+    # run_categorical()
+    run_iris()
