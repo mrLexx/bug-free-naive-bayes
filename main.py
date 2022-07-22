@@ -2,6 +2,9 @@ import pandas as pd
 import numpy as np
 import naive_bayes as nb
 
+import pprint
+pp = pprint.PrettyPrinter(indent=4)
+
 
 def get_stem(word, lang=None):
     if lang is None:
@@ -386,6 +389,8 @@ def run_spam_ham():
 
 
 def run_multinomial():
+    # 'sports' == 1
+    # 'suv' == 2
     train_data = [
         ['red', 'sports', 'domestic', 1],
         ['red', 'sports', 'domestic', 0],
@@ -410,7 +415,8 @@ def run_multinomial():
 
     multinomial = nb.NaiveBayesCategorical()
     multinomial.train(df=df_train, class_column='stolen')
-    print(multinomial.get_likelihood_table())
+    # pp.pprint(multinomial.get_likelihood_table())
+    # return
 
     data_check = {'color': 'red', 'type': 'suv', 'origin': 'domestic'}
     p = multinomial.probability(data_check=data_check)
@@ -428,7 +434,7 @@ def run_multinomial():
     print()
     print('raw probability: {0}'.format(p['probability']))
 
-    return ''
+    return
 
 
 if __name__ == '__main__':
