@@ -322,6 +322,18 @@ class NaiveBayesCategorical:
             p['probability'][cl] = tmp_p
         return p
 
+    @staticmethod
+    def prepare_for_query(val):
+        """
+        Prepare value for DataFrame.query: check str or other type
+        :param val:
+        :return:
+        """
+        if isinstance(val, str):
+            return f'"{val}"'
+        else:
+            return f'{val}'
+
     def train(self, df: DataFrame, class_column: str):
         self.class_column = class_column
         class_values = df[class_column].unique()
@@ -333,19 +345,13 @@ class NaiveBayesCategorical:
             self.likelihood_table[cl] = {}
             for column in df.head(0):
                 if column != class_column:
-                    # if isinstance(cl, int):
-                    #     query = f'{class_column}=={cl}'
-                    # else:
-                    query = f'{class_column}=="{cl}"'
+                    query = f'{class_column}=={self.prepare_for_query(cl)}'
                     cnt_all = len(df.query(query)[column])
                     self.likelihood_table[cl][column] = {
                         '_cnt_': cnt_all,
                         '_data_': {},
                     }
                     for val in (df[column].unique()):
-                        # if isinstance(cl, int):
-                        #     query = f'{column}=="{val}" & {class_column}=={cl}'
-                        # else:
-                        query = f'{column}=="{val}" & {class_column}=="{cl}"'
+                        query = f'{column}=={self.prepare_for_query(val)} & {class_column}=={self.prepare_for_query(cl)}'
                         cnt = len(df.query(query)[column])
                         self.likelihood_table[cl][column]['_data_'][val] = cnt
