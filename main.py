@@ -269,7 +269,7 @@ def run_cats_dogs():
 
     # In[ ]:
 
-    cats_dogs.calculate_words(df=df)
+    cats_dogs.train(df=df)
 
     print('All - {0}, without stop words - {1}'.format(len(cats_dogs.words_all), len(cats_dogs.words_without_stop)))
 
@@ -357,7 +357,7 @@ def run_spam_ham():
 
     # In[ ]:
 
-    words_all, words_without_stop = spam_ham.calculate_words(df=df)
+    words_all, words_without_stop = spam_ham.train(df=df)
 
     print('All - {0}, without stop words - {1}'.format(len(words_all), len(words_without_stop)))
     # ### Проверка на тестовой выборке

@@ -271,6 +271,18 @@ class NaiveBayesMultinomial:
         print()
 
     def calculate_words(self, df: DataFrame):
+        """
+        Deprecated, user train
+        :param df:
+        :return:
+        """
+        return self.train(df=df)
+
+    def train(self, df: DataFrame):
+        """
+        :param df:
+        :return:
+        """
         # global index_class1, index_class2
         self.words_all = defaultdict(lambda: [0, 0])
         self.words_without_stop = defaultdict(lambda: [0, 0])
@@ -288,6 +300,9 @@ class NaiveBayesMultinomial:
                 if word not in self._stop_words:
                     self.words_without_stop[word][i] += 1
 
+        return self.get_model()
+
+    def get_model(self):
         return [self.words_all, self.words_without_stop]
 
     def set_title(self, class1_title, class2_title):
@@ -302,6 +317,13 @@ class NaiveBayesCategorical:
         pass
 
     def get_likelihood_table(self):
+        return self.get_model()
+
+    def get_model(self):
+        """
+        Get likelihood table
+        :return:
+        """
         return self.likelihood_table
 
     def probability(self, data_check: dict):
